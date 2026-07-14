@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glance Fashion Search Gallery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent-glow: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --neon-blue: #38bdf8;
+            --neon-green: #4ade80;
+            --neon-yellow: #facc15;
+            --neon-pink: #f472b6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding: 3rem;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: var(--accent-glow);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto 1.5rem auto;
+            line-height: 1.6;
+        }
+
+        .tech-tags {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--neon-blue);
+        }
+
+        .query-section {
+            margin-bottom: 5rem;
+        }
+
+        .query-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            border-left: 5px solid #6366f1;
+            padding-left: 1.5rem;
+        }
+
+        .query-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .query-pairs {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: var(--neon-pink);
+            font-size: 0.85rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 99px;
+            font-weight: 600;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 12px 40px rgba(99, 102, 241, 0.2);
+        }
+
+        .image-container {
+            position: relative;
+            width: 100%;
+            padding-top: 130%; /* 4:3 Aspect Ratio approx for fashion portraits */
+            background: #141b2d;
+            overflow: hidden;
+        }
+
+        .image-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .card:hover .image-container img {
+            transform: scale(1.05);
+        }
+
+        .rank-badge {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(11, 15, 25, 0.75);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 2.2rem;
+            height: 2.2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1rem;
+            color: #ffffff;
+            z-index: 2;
+        }
+
+        .score-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(99, 102, 241, 0.9);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 99px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
+            z-index: 2;
+        }
+
+        .card-content {
+            padding: 1.25rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .caption {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: var(--text-primary);
+            font-weight: 500;
+            margin-bottom: 1rem;
+            min-height: 2.8rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .metrics {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 0.75rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-row span:last-child {
+            font-family: monospace;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .metric-row.boost {
+            color: var(--neon-green);
+        }
+        
+        .metric-row.boost span:last-child {
+            color: var(--neon-green);
+        }
+
+        .filename {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-family: monospace;
+            margin-top: 0.5rem;
+            text-align: right;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Fashion & Context Retrieval Dashboard</h1>
+            <p class="subtitle">
+                Glance Machine Learning Assignment: An intelligent search engine leveraging a zero-shot multi-modal CLIP baseline 
+                and a SentenceTransformer hybrid re-ranking pipeline powered by relational vision-language descriptions (BLIP).
+            </p>
+            <div class="tech-tags">
+                <span class="tag">OpenAI CLIP-ViT-B/32</span>
+                <span class="tag">Salesforce BLIP-Captioning</span>
+                <span class="tag">SentenceTransformer MiniLM-L6</span>
+                <span class="tag">Compositional Tag Parsing</span>
+            </div>
+        </header>
+
+        <main>
+
+            <section class="query-section">
+                <div class="query-header">
+                    <h2 class="query-title">Query: "A person in a bright yellow raincoat."</h2>
+                    <span class="query-pairs">Parsed attributes: yellow + raincoat</span>
+                </div>
+                <div class="grid">
+        
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#1</div>
+                            <div class="score-badge">0.6080</div>
+                            <img src="test/e636280e96f3863157a4398c92fc299e.jpg" alt="e636280e96f3863157a4398c92fc299e.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="a little girl in a yellow raincoat and red tights">a little girl in a yellow raincoat and red tights</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.3235</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.6597</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.1500</span>
+                                </div>
+                                <div class="filename">ID: e636280e96f3863157a4398c92fc299e.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#2</div>
+                            <div class="score-badge">0.4346</div>
+                            <img src="test/2898c07ef740e24cb05c068998a9e23d.jpg" alt="2898c07ef740e24cb05c068998a9e23d.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="a woman in a yellow dress and denim jacket">a woman in a yellow dress and denim jacket</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.3032</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.6316</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.0000</span>
+                                </div>
+                                <div class="filename">ID: 2898c07ef740e24cb05c068998a9e23d.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#3</div>
+                            <div class="score-badge">0.4077</div>
+                            <img src="test/1ae9cdebd762234889e60f2c0d07a768.jpg" alt="1ae9cdebd762234889e60f2c0d07a768.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="a woman in a yellow coat and white turtle neck sweater">a woman in a yellow coat and white turtle neck sweater</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.2799</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.5994</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.0000</span>
+                                </div>
+                                <div class="filename">ID: 1ae9cdebd762234889e60f2c0d07a768.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#4</div>
+                            <div class="score-badge">0.3956</div>
+                            <img src="test/4f7fefd0c03de78fb289b74e553b6f26.jpg" alt="4f7fefd0c03de78fb289b74e553b6f26.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="a woman in a yellow skirt and jacket">a woman in a yellow skirt and jacket</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.2466</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.6190</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.0000</span>
+                                </div>
+                                <div class="filename">ID: 4f7fefd0c03de78fb289b74e553b6f26.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#5</div>
+                            <div class="score-badge">0.3953</div>
+                            <img src="test/3b9cc0d697af512490a7bf58883f9a20.jpg" alt="3b9cc0d697af512490a7bf58883f9a20.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="person in a yellow dress">person in a yellow dress</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.2354</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.6352</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.0000</span>
+                                </div>
+                                <div class="filename">ID: 3b9cc0d697af512490a7bf58883f9a20.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                </div>
+            </section>
+        
+            <section class="query-section">
+                <div class="query-header">
+                    <h2 class="query-title">Query: "Professional business attire inside a modern office."</h2>
+                    
+                </div>
+                <div class="grid">
+        
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#1</div>
+                            <div class="score-badge">0.3138</div>
+                            <img src="test/1731c6223212d540b428bf1cb1183876.jpg" alt="1731c6223212d540b428bf1cb1183876.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="a model wears a creation by person">a model wears a creation by person</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.2733</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.3747</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.0000</span>
+                                </div>
+                                <div class="filename">ID: 1731c6223212d540b428bf1cb1183876.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#2</div>
+                            <div class="score-badge">0.3010</div>
+                            <img src="test/3ec190ed1d5b8f97d7f8923ebda61de7.jpg" alt="3ec190ed1d5b8f97d7f8923ebda61de7.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="a model in a dress at the fashion show">a model in a dress at the fashion show</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.2005</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.4517</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.0000</span>
+                                </div>
+                                <div class="filename">ID: 3ec190ed1d5b8f97d7f8923ebda61de7.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#3</div>
+                            <div class="score-badge">0.2987</div>
+                            <img src="test/2745b607f99c51112aba66b10c120ca2.jpg" alt="2745b607f99c51112aba66b10c120ca2.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="a model wears a creation by person">a model wears a creation by person</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.2480</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.3747</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.0000</span>
+                                </div>
+                                <div class="filename">ID: 2745b607f99c51112aba66b10c120ca2.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#4</div>
+                            <div class="score-badge">0.2961</div>
+                            <img src="test/247ac98e288609e616f1dde9aede4e94.jpg" alt="247ac98e288609e616f1dde9aede4e94.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="a woman in a beige dress standing in a room">a woman in a beige dress standing in a room</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.2506</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.3643</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.0000</span>
+                                </div>
+                                <div class="filename">ID: 247ac98e288609e616f1dde9aede4e94.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#5</div>
+                            <div class="score-badge">0.2932</div>
+                            <img src="test/4f55ee2a4882753c0d92a1529c2def3f.jpg" alt="4f55ee2a4882753c0d92a1529c2def3f.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="a model in a leather dress">a model in a leather dress</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.1943</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.4416</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.0000</span>
+                                </div>
+                                <div class="filename">ID: 4f55ee2a4882753c0d92a1529c2def3f.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                </div>
+            </section>
+        
+            <section class="query-section">
+                <div class="query-header">
+                    <h2 class="query-title">Query: "Someone wearing a blue shirt sitting on a park bench."</h2>
+                    <span class="query-pairs">Parsed attributes: blue + shirt</span>
+                </div>
+                <div class="grid">
+        
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#1</div>
+                            <div class="score-badge">0.4521</div>
+                            <img src="test/9c09bc13950c049c82bab5f9bef36fb4.jpg" alt="9c09bc13950c049c82bab5f9bef36fb4.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="a man in a blue shirt and jeans standing on the street">a man in a blue shirt and jeans standing on the street</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.2799</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.3355</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.1500</span>
+                                </div>
+                                <div class="filename">ID: 9c09bc13950c049c82bab5f9bef36fb4.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#2</div>
+                            <div class="score-badge">0.4373</div>
+                            <img src="test/f06fd9e18c7a2c5b533e68de88fb487b.jpg" alt="f06fd9e18c7a2c5b533e68de88fb487b.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="a young girl sitting on a bench in the park">a young girl sitting on a bench in the park</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.2978</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.6466</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.0000</span>
+                                </div>
+                                <div class="filename">ID: f06fd9e18c7a2c5b533e68de88fb487b.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#3</div>
+                            <div class="score-badge">0.4115</div>
+                            <img src="test/0e0504a8c053aed418aaeebd2be60ce3.jpg" alt="0e0504a8c053aed418aaeebd2be60ce3.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="a man in a blue shirt and black hat stands in the woods">a man in a blue shirt and black hat stands in the woods</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.2086</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.3410</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.1500</span>
+                                </div>
+                                <div class="filename">ID: 0e0504a8c053aed418aaeebd2be60ce3.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#4</div>
+                            <div class="score-badge">0.3870</div>
+                            <img src="test/a2b5ec83b7656e331622ac3c00606161.jpg" alt="a2b5ec83b7656e331622ac3c00606161.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="a woman sitting on the ground in a park">a woman sitting on the ground in a park</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.2838</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.5416</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.0000</span>
+                                </div>
+                                <div class="filename">ID: a2b5ec83b7656e331622ac3c00606161.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#5</div>
+                            <div class="score-badge">0.3729</div>
+                            <img src="test/005b37fce3c0f641d327d95dd832f51b.jpg" alt="005b37fce3c0f641d327d95dd832f51b.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="a woman in a white shirt and blue pants">a woman in a white shirt and blue pants</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.1897</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.2726</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.1500</span>
+                                </div>
+                                <div class="filename">ID: 005b37fce3c0f641d327d95dd832f51b.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                </div>
+            </section>
+        
+            <section class="query-section">
+                <div class="query-header">
+                    <h2 class="query-title">Query: "Casual weekend outfit for a city walk."</h2>
+                    
+                </div>
+                <div class="grid">
+        
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#1</div>
+                            <div class="score-badge">0.3336</div>
+                            <img src="test/327da40ed586be878e85f72b4c192b2f.jpg" alt="327da40ed586be878e85f72b4c192b2f.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="a model walks the ramp at the lakm fashion week">a model walks the ramp at the lakm fashion week</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.2234</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.4989</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.0000</span>
+                                </div>
+                                <div class="filename">ID: 327da40ed586be878e85f72b4c192b2f.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#2</div>
+                            <div class="score-badge">0.3205</div>
+                            <img src="test/3847d09a2d4cd130c008c60fdd7832a1.jpg" alt="3847d09a2d4cd130c008c60fdd7832a1.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="a model walks the runway at the west coast fashion week">a model walks the runway at the west coast fashion week</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.2302</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.4559</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.0000</span>
+                                </div>
+                                <div class="filename">ID: 3847d09a2d4cd130c008c60fdd7832a1.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#3</div>
+                            <div class="score-badge">0.3191</div>
+                            <img src="test/112a9c9b9c7a97f3f632b2ec7fd064e5.jpg" alt="112a9c9b9c7a97f3f632b2ec7fd064e5.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="a woman in a denim jacket and skirt walking down the street">a woman in a denim jacket and skirt walking down the street</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.2710</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.3913</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.0000</span>
+                                </div>
+                                <div class="filename">ID: 112a9c9b9c7a97f3f632b2ec7fd064e5.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#4</div>
+                            <div class="score-badge">0.3178</div>
+                            <img src="test/03272452a2491dbed76a28035e195d32.jpg" alt="03272452a2491dbed76a28035e195d32.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="a man walking down a street in a gray shirt and black pants">a man walking down a street in a gray shirt and black pants</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.2587</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.4064</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.0000</span>
+                                </div>
+                                <div class="filename">ID: 03272452a2491dbed76a28035e195d32.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#5</div>
+                            <div class="score-badge">0.3172</div>
+                            <img src="test/0d2c936a0c0acff642b5a8c5e85fd461.jpg" alt="0d2c936a0c0acff642b5a8c5e85fd461.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="a woman in black coat and sneakers walking down the street">a woman in black coat and sneakers walking down the street</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.2655</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.3948</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.0000</span>
+                                </div>
+                                <div class="filename">ID: 0d2c936a0c0acff642b5a8c5e85fd461.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                </div>
+            </section>
+        
+            <section class="query-section">
+                <div class="query-header">
+                    <h2 class="query-title">Query: "A red tie and a white shirt in a formal setting."</h2>
+                    <span class="query-pairs">Parsed attributes: red + tie, white + shirt</span>
+                </div>
+                <div class="grid">
+        
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#1</div>
+                            <div class="score-badge">0.5440</div>
+                            <img src="test/05f4264fb2ef7d7928d8b85522672ec0.jpg" alt="05f4264fb2ef7d7928d8b85522672ec0.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="person in a black suit and red tie">person in a black suit and red tie</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.2708</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.5789</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.1500</span>
+                                </div>
+                                <div class="filename">ID: 05f4264fb2ef7d7928d8b85522672ec0.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#2</div>
+                            <div class="score-badge">0.4495</div>
+                            <img src="test/086d00c234f4cb9aa9798860266c3c3f.jpg" alt="086d00c234f4cb9aa9798860266c3c3f.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="person in red boots and a white shirt">person in red boots and a white shirt</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.2426</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.3848</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.1500</span>
+                                </div>
+                                <div class="filename">ID: 086d00c234f4cb9aa9798860266c3c3f.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#3</div>
+                            <div class="score-badge">0.4129</div>
+                            <img src="test/0cb2351c74ccc0b38128e91d0629625d.jpg" alt="0cb2351c74ccc0b38128e91d0629625d.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="a woman in a white shirt and brown skirt">a woman in a white shirt and brown skirt</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.2181</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.3300</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.1500</span>
+                                </div>
+                                <div class="filename">ID: 0cb2351c74ccc0b38128e91d0629625d.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#4</div>
+                            <div class="score-badge">0.4035</div>
+                            <img src="test/33a60f6f6d0abe76697705b61564ad30.jpg" alt="33a60f6f6d0abe76697705b61564ad30.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="a woman wearing a tan skirt and a white shirt">a woman wearing a tan skirt and a white shirt</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.1944</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.3423</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.1500</span>
+                                </div>
+                                <div class="filename">ID: 33a60f6f6d0abe76697705b61564ad30.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="image-container">
+                            <div class="rank-badge">#5</div>
+                            <div class="score-badge">0.4016</div>
+                            <img src="test/430b93c1865a56185b4606b7d58d3e4b.jpg" alt="430b93c1865a56185b4606b7d58d3e4b.jpg" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <p class="caption" title="a woman in a brown vest and white shirt">a woman in a brown vest and white shirt</p>
+                            <div class="metrics">
+                                <div class="metric-row">
+                                    <span>CLIP visual score:</span>
+                                    <span>0.1965</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>VLM text score:</span>
+                                    <span>0.3343</span>
+                                </div>
+                                <div class="metric-row boost">
+                                    <span>Composition boost:</span>
+                                    <span>+0.1500</span>
+                                </div>
+                                <div class="filename">ID: 430b93c1865a56185b4606b7d58d3e4b.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+            
+                </div>
+            </section>
+        
+        </main>
+    </div>
+</body>
+</html>

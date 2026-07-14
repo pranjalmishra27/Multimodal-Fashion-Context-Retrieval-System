@@ -1,0 +1,5 @@
+test/
+search_results/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
